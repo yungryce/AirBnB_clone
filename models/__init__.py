@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/python3
 """
 __init__ magic method for models directory
 unique FileStorage instance for your application
