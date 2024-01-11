@@ -7,7 +7,8 @@ from models.base_model import BaseModel
 
 
 class FileStorage:
-    """Serializes instances to a JSON file and Deserializes JSON file to instances"""
+    """Serializes instances to a JSON file and
+    Deserializes JSON file to instances"""
 
     __file_path = "file.json"
     __objects = {}
@@ -19,7 +20,7 @@ class FileStorage:
         """return all objects stored in the file"""
         return self.__objects
         # return FileStorage.__objects
-        
+
     def new(self, obj):
         """_summary_
         sets the object to the __objects dict and adds the key to the key
@@ -39,7 +40,7 @@ class FileStorage:
 
         with open(self.__file_path, "w", encoding="UTF-8") as file:
             json.dump(serialized_obj, file)
-            
+
     def reload(self):
         """Deserializes the JSON file to objects"""
         if os.path.exists(self.__file_path):
