@@ -2,6 +2,7 @@ import unittest
 from models.base_model import BaseModel
 from models.engine.file_storage import FileStorage
 
+
 class TestDocstrings(unittest.TestCase):
     """Test case for checking docstrings"""
 
@@ -49,6 +50,7 @@ class TestDocstrings(unittest.TestCase):
                         0,
                         f"Empty docs for {func_name} in {module_class}"
                         )
+
 
 if __name__ == "__main__":
     unittest.main()

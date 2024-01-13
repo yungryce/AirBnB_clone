@@ -4,6 +4,12 @@
 import json
 import os
 from models.base_model import BaseModel
+from models.user import User
+from models.state import State
+from models.city import City
+from models.amenity import Amenity
+from models.place import Place
+from models.review import Review
 
 
 class FileStorage:
@@ -14,6 +20,12 @@ class FileStorage:
     __objects = {}
     __current_classes = {
         'BaseModel': BaseModel,
+        'User': User,
+        'State': State,
+        'City': City,
+        'Amenity': Amenity,
+        'Place': Place,
+        'Review': Review
     }
 
     def all(self):
@@ -48,12 +60,12 @@ class FileStorage:
                 with open(self.__file_path, "r") as file:
                     new_obj = json.load(file)
                     for key, val in new_obj.items():
-                        """class_name = val['__class__']
+                        # obj = BaseModel(**val)
+                        # self.__objects[key] = obj
+                        class_name = val['__class__']
                         if class_name in self.__current_classes:
                             class_obj = self.__current_classes[class_name]
                             obj = class_obj(**val)
-                            self.__objects[key] = obj"""
-                        obj = BaseModel(**val)
-                        self.__objects[key] = obj
+                            self.__objects[key] = obj
             except Exception:
                 pass

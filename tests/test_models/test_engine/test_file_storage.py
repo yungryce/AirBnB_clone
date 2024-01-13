@@ -4,6 +4,7 @@ import json
 from models.base_model import BaseModel
 from models.engine.file_storage import FileStorage
 
+
 class TestFileStorage(unittest.TestCase):
     """Test case for FileStorage"""
 
@@ -68,6 +69,7 @@ class TestFileStorage(unittest.TestCase):
         self.storage.reload()
         reloaded_objects = self.storage.all()
         self.assertEqual(len(reloaded_objects), 0)
+
 
 if __name__ == "__main__":
     unittest.main()

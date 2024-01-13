@@ -1,46 +1,85 @@
 #!/usr/bin/python3
-""""""
+"""
+Command line interface module.
+Prompt:
+    (hbnb)
+Commands:
+    help - displays a list of commands
+    quit - exits the program
+    create - creates a new instance of a class
+    show - displays an instance of a class
+    all - displays all instances of a class
+    destroy - destroys an instance of a class
+    update - updates an instance of a class
+"""
 import cmd
+import re
 import shlex
 from models import storage
 from models.base_model import BaseModel
+from models.user import User
+from models.state import State
+from models.city import City
+from models.amenity import Amenity
+from models.place import Place
+from models.review import Review
+
 
 current_classes = {
     'BaseModel': BaseModel,
+    'User': User,
+    'State': State,
+    'City': City,
+    'Amenity': Amenity,
+    'Place': Place,
+    'Review': Review
 }
 
 
 class HBNBCommand(cmd.Cmd):
     """
     Command interpreter for HBNB project
-    any command that returns a true value stops the interpreter.
+    Any command that returns a true value stops the interpreter.
     """
 
     prompt = "(hbnb) "
 
-    """def do_help(self, arg):
-        # To get help on a command, type help <topic>.
-        return super().do_help(arg)"""
-
-    def do_quit(self, arg):
-        """Quit command to exit the program"""
-        return True
-
-    def do_EOF(self, arg):
-        """Exit the program"""
-        print()  # Add a new line before exiting
-        return True
-
-    def emptyline(self):
-        """Do nothing on empty line"""
-        pass
-
-    def default(self, line):
+    def precmd(self, arg):
         """
-        Default method to be called when none of the above commands match
+        Pre-process the command line before it is interpreted.
+        Usage:
+            <Class Name>.<method name>(arg1, arg2, arg3)
         """
-        print(f"*** Unknown syntax: {line}")
-        print(f"*** Type help or? to list commands")
+        if not arg:
+            return '\n'
+
+        pattern = re.compile(r'(\w+)\.(\w+)\((.*)\)')
+        pattern_match = pattern.findall(arg)
+        if not pattern_match:
+            return super().precmd(arg)
+
+        match_tuple = pattern_match[0]
+        if not match_tuple[1] or not hasattr(self, 'do_' + match_tuple[1]):
+            return '\n'
+            
+        all_args = [match_tuple[1], match_tuple[0]]        
+        if len(match_tuple) > 2 and match_tuple[2] != '':
+            args = [arg.strip(',') for arg in shlex.split(match_tuple[2])]
+            all_args.extend(args)
+        
+        if len(all_args) > 4 and ' ' in all_args[4]:
+            args[2] = args[2].replace(' ', '_')
+
+        args_str = ' '.join(all_args[1:])
+        method_name = 'do_' + all_args[0]
+        getattr(self, method_name)(args_str)
+        return '\n'
+
+    def do_count(self, arg):
+        """Returns count of all Instances of a class"""
+        args = shlex.split(arg)
+        intance = storage.all()
+        print(len([x for x in intance if x.startswith(args[1])]))
 
     def do_create(self, arg):
         """
@@ -90,29 +129,31 @@ class HBNBCommand(cmd.Cmd):
                 all <class name>
         """
         args = shlex.split(arg)
-        l = []
+        str_list = []
         if not args:
             for key in storage.all():
-                l.append(str(storage.all()[key]))
-        elif args[0] not in current_classes.keys():
-            print("** class doesn't exist **")
-        else:
+                str_list.append(str(storage.all()[key]))
+        elif validate_classname(args):
             for key in storage.all():
                 if key.startswith(args[0]):
-                    l.append(str(storage.all()[key]))
-                    
-        print(l)
+                    str_list.append(str(storage.all()[key]))
+        print(str_list)
 
     def do_update(self, arg):
         """
         Updates an instance based on user input
         Usage:  update <class name> <id> <attribute name> "<attribute value>"
         """
+        print(arg)
         args = shlex.split(arg)
-        
+
         if (not validate_classname(args, check_id=True)
-            or not validate_attrs(args)):
+                or not validate_attrs(args)):
             return
+
+        if args[3] and '_' in args[3]:
+            args[3] = args[3].replace('_', ' ')
+
         key = f"{args[0]}.{args[1]}"
         if key in storage.all():
             instance = storage.all()[key].to_dict()
@@ -120,29 +161,28 @@ class HBNBCommand(cmd.Cmd):
                 type_value = type(instance[args[2]])
                 instance[args[2]] = type_value(args[3])
             else:
-                instance[args[2]] = args[3].strip('"')
+                instance[args[2]] = args[3]
         else:
             print("** no instance found **")
-            
+            return
+
         new_instance = current_classes[args[0]](**instance)
         storage.new(new_instance)
         new_instance.save()
 
-    def do_type(self, arg):
-        """
-        checks the types of attributes in an instance
-        Usage:  checkTypes <class name> <id> <attribute name>
-        """
-        args = shlex.split(arg)
-        if not validate_classname(args, check_id=True):
-            return
-        if not args[2]:
-            print("** attribute name missing **")
-            return
-        key = f"{args[0]}.{args[1]}"
-        if key in storage.all():
-            for key, value in storage.all()[key].to_dict().items():
-                print(f"{key}: {type(value)}")
+    def do_quit(self, arg):
+        """Quit command to exit the program"""
+        return True
+
+    def do_EOF(self, arg):
+        """Exit the program"""
+        print()  # Add a new line before exiting
+        return True
+
+    def emptyline(self):
+        """Do nothing on empty line"""
+        pass
+
 
 def validate_classname(args, check_id=False):
     """Runs checks on args to validate classname entry.
@@ -165,7 +205,7 @@ def validate_attrs(args):
     if len(args) < 3:
         print("** attribute name missing **")
         return False
-    if len(args) < 4:
+    if len(args) < 4 :
         print("** value missing **")
         return False
     return True
