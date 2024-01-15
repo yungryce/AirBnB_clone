@@ -15,6 +15,7 @@ Commands:
 import cmd
 import re
 import shlex
+import ast
 from models import storage
 from models.base_model import BaseModel
 from models.user import User
@@ -50,23 +51,32 @@ class HBNBCommand(cmd.Cmd):
         Usage:
             <Class Name>.<method name>(arg1, arg2, arg3)
         """
-        if not arg:
+        if not arg or arg == '':
             return '\n'
 
         pattern = re.compile(r'(\w+)\.(\w+)\((.*)\)')
-        pattern_match = pattern.findall(arg)
-        if not pattern_match:
+        tuple_match = pattern.findall(arg)
+        if not tuple_match:
             return super().precmd(arg)
 
-        match_tuple = pattern_match[0]
-        if not match_tuple[1] or not hasattr(self, 'do_' + match_tuple[1]):
+        match_list = tuple_match[0]
+        if not match_list[1] or not hasattr(self, 'do_' + match_list[1]):
             return '\n'
-            
-        all_args = [match_tuple[1], match_tuple[0]]        
-        if len(match_tuple) > 2 and match_tuple[2] != '':
-            args = [arg.strip(',') for arg in shlex.split(match_tuple[2])]
-            all_args.extend(args)
-        
+
+        all_args = [match_list[1], match_list[0]]
+        if len(match_list) > 2 and match_list[2] != '':
+            dict_pattern = re.compile(r'\{.+?\}')
+            dict_match = dict_pattern.search(match_list[2])
+            if dict_match:
+                uuid_pattern = re.compile(r'"([^"]*)"')
+                uuid_match = uuid_pattern.search(match_list[2])
+                if uuid_match:
+                    all_args.append(uuid_match.group(1))
+                    all_args.append(dict_match.group(0))
+            else:
+                args = [arg.rstrip(',') for arg in shlex.split(match_list[2])]
+                all_args.extend(args)
+
         if len(all_args) > 4 and ' ' in all_args[4]:
             args[2] = args[2].replace(' ', '_')
 
@@ -75,11 +85,15 @@ class HBNBCommand(cmd.Cmd):
         getattr(self, method_name)(args_str)
         return '\n'
 
+    def default(self, arg):
+        """"""
+        self.precmd(arg)
+
     def do_count(self, arg):
         """Returns count of all Instances of a class"""
         args = shlex.split(arg)
         intance = storage.all()
-        print(len([x for x in intance if x.startswith(args[1])]))
+        print(len([x for x in intance if x.startswith(args[0])]))
 
     def do_create(self, arg):
         """
@@ -106,6 +120,7 @@ class HBNBCommand(cmd.Cmd):
             print(storage.all()[key])
         else:
             print("** no instance found **")
+            return False
 
     def do_destroy(self, arg):
         """
@@ -121,6 +136,7 @@ class HBNBCommand(cmd.Cmd):
             storage.save()
         else:
             print("** no instance found **")
+            return False
 
     def do_all(self, arg):
         """
@@ -137,15 +153,35 @@ class HBNBCommand(cmd.Cmd):
             for key in storage.all():
                 if key.startswith(args[0]):
                     str_list.append(str(storage.all()[key]))
-        print(str_list)
+        if str_list:
+            print(str_list)
 
     def do_update(self, arg):
         """
         Updates an instance based on user input
         Usage:  update <class name> <id> <attribute name> "<attribute value>"
         """
-        print(arg)
-        args = shlex.split(arg)
+        pattern = re.compile(r'\{.*?\}')
+        dict_match = pattern.search(arg)
+
+        if dict_match:
+            new_pattern = re.compile(r'(\w+)\s+(\S+).*')
+            new_match = new_pattern.search(arg)
+            if new_match:
+                base_args = [new_match.group(1), new_match.group(2)]
+
+            str_dict = ast.literal_eval(dict_match.group())
+            for key, value in str_dict.items():
+                updated_args = base_args.copy()
+                updated_args.append(key)
+                updated_args.append(str(value))
+                if updated_args[3] and ' ' in updated_args[3]:
+                    updated_args[3] = updated_args[3].replace(' ', '_')
+                updated_arg = ', '.join(updated_args)
+                self.do_update(updated_arg)
+            return
+        else:
+            args = [arg.rstrip(',') for arg in shlex.split(arg)]
 
         if (not validate_classname(args, check_id=True)
                 or not validate_attrs(args)):
@@ -164,7 +200,7 @@ class HBNBCommand(cmd.Cmd):
                 instance[args[2]] = args[3]
         else:
             print("** no instance found **")
-            return
+            return False
 
         new_instance = current_classes[args[0]](**instance)
         storage.new(new_instance)
@@ -205,7 +241,7 @@ def validate_attrs(args):
     if len(args) < 3:
         print("** attribute name missing **")
         return False
-    if len(args) < 4 :
+    if len(args) < 4:
         print("** value missing **")
         return False
     return True
