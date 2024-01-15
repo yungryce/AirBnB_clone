@@ -86,7 +86,7 @@ class HBNBCommand(cmd.Cmd):
         return '\n'
 
     def default(self, arg):
-        """"""
+        """Default method for unknown commands"""
         self.precmd(arg)
 
     def do_count(self, arg):
@@ -120,7 +120,6 @@ class HBNBCommand(cmd.Cmd):
             print(storage.all()[key])
         else:
             print("** no instance found **")
-            return False
 
     def do_destroy(self, arg):
         """
@@ -136,7 +135,6 @@ class HBNBCommand(cmd.Cmd):
             storage.save()
         else:
             print("** no instance found **")
-            return False
 
     def do_all(self, arg):
         """
@@ -236,8 +234,7 @@ def validate_classname(args, check_id=False):
 
 
 def validate_attrs(args):
-    """Runs checks on args to validate classname attributes and values.
-    """
+    """Runs checks on args to validate classname attributes and values."""
     if len(args) < 3:
         print("** attribute name missing **")
         return False

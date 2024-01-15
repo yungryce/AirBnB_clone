@@ -1,6 +1,15 @@
 import unittest
 from models.base_model import BaseModel
 from models.engine.file_storage import FileStorage
+from models.user import User
+from models.state import State
+from models.city import City
+from models.amenity import Amenity
+from models.place import Place
+from models.review import Review
+from datetime import datetime
+from models.review import Review
+from console import HBNBCommand
 
 
 class TestDocstrings(unittest.TestCase):
@@ -9,6 +18,13 @@ class TestDocstrings(unittest.TestCase):
     MODULES_TO_TEST = [
         BaseModel,
         FileStorage,
+        User,
+        State,
+        City,
+        Amenity,
+        Place,
+        Review,
+        HBNBCommand
         # Add other modules to test here
     ]
 
@@ -36,10 +52,14 @@ class TestDocstrings(unittest.TestCase):
 
     def test_functions_docstrings(self):
         """Test functions docstrings"""
+        excluded_methods = {'complete_help', 'completenames', 'get_names',
+                            'print_topics'}
+
         for module_class in self.MODULES_TO_TEST:
             for func_name in dir(module_class):
                 if (callable(getattr(module_class, func_name)) and
-                        not func_name.startswith("__")):
+                        not func_name.startswith("__") and
+                        func_name not in excluded_methods):
                     func = getattr(module_class, func_name)
                     self.assertIsNotNone(
                             func.__doc__,
