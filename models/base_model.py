@@ -11,7 +11,9 @@ class BaseModel:
         """
         Initialize a class
         Args:
-            *args: variable number of positional args in a tuple
+            *args: variable number of positional args in a 
+            
+            ple
             **kwargs (dict): Key/value pairs
         """
         self.id = str(uuid4())
