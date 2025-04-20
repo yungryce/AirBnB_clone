@@ -1,79 +1,80 @@
-# AirBnB Clone Project
+# AirBnB Clone
 
-## Description
+![AirBnB Logo](https://i.imgur.com/QiU1LdE.png)
 
-The AirBnB clone project involves building a command-line interpreter to manage AirBnB objects. The primary steps include:
+A command-line clone of AirBnB with a console interface and file storage.
 
-1. **BaseModel Class:**
-   - Implement a parent class named `BaseModel` responsible for the initialization, serialization, and deserialization of future instances.
+## Technology Signature
 
-2. **Serialization/Deserialization Flow:**
-   - Create a simple flow of serialization/deserialization: `Instance <-> Dictionary <-> JSON string <-> File`.
+| Category | Technologies |
+|----------|-------------|
+| **Languages** | Python 3.x |
+| **Frontend** | HTML5, CSS3 |
+| **Storage** | JSON File Storage |
+| **Interface** | Command-line (cmd module) |
+| **Testing** | unittest framework |
 
-3. **AirBnB Classes:**
-   - Create classes for AirBnB objects (e.g., User, State, City, Place, etc.) that inherit from the `BaseModel` class.
+## Demonstrated Competencies
 
-4. **Storage Engine:**
-   - Develop the first abstracted storage engine for the project: File storage.
+### Technical Skills
+- **Object-Oriented Programming**: Class inheritance, encapsulation, polymorphism
+- **Serialization/Deserialization**: JSON conversion, data persistence
+- **Command-line Interface Development**: Interactive shell using cmd module
+- **Web Frontend Development**: Responsive HTML/CSS layouts
+- **Software Architecture**: MVC pattern implementation
+- **Testing**: Unit testing with Python's unittest framework
 
-5. **Unit Tests:**
-   - Implement unittests to validate all classes and the storage engine.
+### Domain Knowledge
+- **Property Management Systems**: Modeling of places, users, reviews
+- **Accommodation Services**: Representation of amenities, locations
+- **Data Modeling**: Entity relationships between users, places, and reviews
 
-## Command Interpreter
+## System Context
 
-### Features:
+This project implements a command-line interpreter to manage AirBnB objects with file-based storage and static web pages.
 
-- **Create a New Object:**
-  - Create a new instance of an object, such as a new User or a new Place.
+## Getting Started
 
-- **Retrieve an Object:**
-  - Retrieve an object from a file, database, etc.
-
-- **Operations on Objects:**
-  - Perform operations on objects, such as counting, computing stats, etc.
-
-- **Update Object Attributes:**
-  - Update attributes of an object.
-
-- **Destroy an Object:**
-  - Delete an object.
-
-### Usage:
-
-**Interactive Mode:**
+### Installation
 ```bash
-$ ./console.py
+git clone https://github.com/username/AirBnB_clone.git
+cd AirBnB_clone
+```
+
+## Usage
+
+### Interactive Mode
+```bash
+./console.py
 (hbnb) help
 
 Documented commands (type help <topic>):
 ========================================
-EOF  help  quit
+EOF  all  create  destroy  help  quit  show  update
 
-(hbnb) 
-(hbnb) 
-(hbnb) quit
-$
+(hbnb) create BaseModel
+49faff9a-6318-451f-87b6-910505c55907
+(hbnb) all
+["[BaseModel] (49faff9a-6318-451f-87b6-910505c55907) {'id': '49faff9a-6318-451f-87b6-910505c55907', 'created_at': datetime.datetime(2023, 2, 18, 10, 21, 12, 96959), 'updated_at': datetime.datetime(2023, 2, 18, 10, 21, 12, 96971)}"]
+```
 
-**Non-Interactive Mode:**
-$ echo "help" | ./console.py
+### Non-Interactive Mode
+```bash
+echo "help" | ./console.py
 (hbnb)
 
 Documented commands (type help <topic>):
 ========================================
-EOF  help  quit
-(hbnb) 
-$
-$ cat test_help
-help
-$
-$ cat test_help | ./console.py
-(hbnb)
+EOF  all  create  destroy  help  quit  show  update
+```
 
-Documented commands (type help <topic>):
-========================================
-EOF  help  quit
-(hbnb) 
-$
+## Running Tests
+```bash
+python3 -m unittest discover tests
+```
 
-**Running Tests:**
-$ echo "python3 -m unittest discover tests" | bash
+## License
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](./LICENSE) file for details.
+
+## Authors
+See the list of [contributors](./AUTHORS) who participated in this project.
